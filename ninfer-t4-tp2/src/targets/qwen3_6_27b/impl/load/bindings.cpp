@@ -116,14 +116,14 @@ Weight materialized_host_weight(const artifact::MaterializedArtifact& materializ
     const auto resource = materialized.resource_bytes(plan.object);
     const std::uint64_t expected_bytes =
         static_cast<std::uint64_t>(rows) * static_cast<std::uint64_t>(columns) *
-        dtype_size(dtype_for(plan.format));
+        dtype_size(artifact::dtype_for(plan.format));
     if (resource.size() < expected_bytes) {
         throw artifact::ArtifactError("host weight buffer is smaller than expected shape");
     }
     Weight out{};
     out.payload         = resource.data();
     out.payload_bytes   = expected_bytes;
-    out.qtype           = qtype_for(plan.format);
+    out.qtype           = artifact::qtype_for(plan.format);
     out.layout          = QuantLayout::Contiguous;
     out.n               = rows;
     out.k               = columns;

@@ -9,7 +9,6 @@
 #include <string>
 
 namespace ninfer::artifact {
-namespace {
 
 StorageLayout storage_layout_for(NumericFormat format) {
     switch (format) {
@@ -66,6 +65,8 @@ DType dtype_for(NumericFormat format) {
         throw std::logic_error("quantized format has no direct dtype");
     }
 }
+
+namespace {
 
 Weight contiguous_weight(const MaterializedArtifact& materialized, ObjectHandle handle,
                          NumericFormat format, std::int32_t rows, std::int32_t columns,

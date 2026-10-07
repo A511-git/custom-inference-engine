@@ -42,4 +42,8 @@ class MaterializedArtifact;
 void require_placement_bytes(const MaterializedArtifact& materialized, ObjectHandle handle,
                              int device, std::uint64_t required_bytes);
 
+[[nodiscard]] StorageLayout storage_layout_for(NumericFormat format);
+[[nodiscard]] QType qtype_for(NumericFormat format);
+[[nodiscard]] DType dtype_for(NumericFormat format);
+
 } // namespace ninfer::artifact
