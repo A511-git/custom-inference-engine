@@ -22,9 +22,9 @@ echo "Available space in /tmp: $(df -h /tmp | awk 'NR==2 {print $4}')"
 echo "===================================================================="
 echo " [Step 2/5] Installing Build Tooling (Ninja, CMake, Aria2)"
 echo "===================================================================="
-if ! command -v ninja &>/dev/null || ! command -v aria2c &>/dev/null; then
+if ! command -v ninja &>/dev/null || ! command -v aria2c &>/dev/null || ! pkg-config --exists libavformat 2>/dev/null; then
     apt-get update -qq
-    apt-get install -y -qq cmake ninja-build aria2
+    apt-get install -y -qq cmake ninja-build aria2 pkg-config libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libcurl4-openssl-dev
 fi
 
 echo "===================================================================="
