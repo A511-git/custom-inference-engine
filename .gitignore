@@ -1,0 +1,102 @@
+# ==============================================================================
+# Git Ignore Configuration - Custom Inference Engine (Root Workspace)
+# ==============================================================================
+
+# Reference Cloned Repositories (Upstream & Alternative Forks)
+# These are kept locally for reference and analysis; each has its own repo history.
+cloned_repos/
+
+# Build & Compilation Artifacts
+build/
+build-*/
+cmake-build-*/
+out/
+bin/
+dist/
+CMakeFiles/
+CMakeCache.txt
+CMakeUserPresets.json
+compile_commands.json
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# CUDA & GPU Profiling Dumps
+*.nsys-rep
+*.ncu-rep
+*.qdrep
+*.sqlite
+*.nvvp
+
+# Large Model Weights & Quantized Checkpoints
+*.safetensors
+*.bin
+*.gguf
+*.pt
+*.pth
+*.qus
+*.onnx
+*.weights
+*.h5
+*.tflite
+models/
+checkpoints/
+
+# Python Tooling & Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS-Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor Configurations
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+.vs/
+
+# Logs & Temporary Files
+*.log
+*.tmp
+logs/
+temp/
+tmp/
+
+# Secrets & Environment Files
+.env
+.env.*
+!.env.example
+*.local.json
