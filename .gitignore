@@ -94,6 +94,7 @@ Thumbs.db
 logs/
 temp/
 tmp/
+custom-engine.ipynb
 
 # Secrets & Environment Files
 .env

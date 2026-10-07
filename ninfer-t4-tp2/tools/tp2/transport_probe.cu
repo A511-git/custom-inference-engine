@@ -200,9 +200,14 @@ bool capturable_graph_node(Pair& p, cudaEvent_t fork_event,
   const cudaGraphNode_t* dependencies = nullptr;
   size_t dependency_count = 0;
   unsigned long long id = 0;
+#if CUDART_VERSION >= 11030
   const cudaError_t info =
-      cudaStreamGetCaptureInfo(p.stream[0], &status, &id, &capturing,
-                               &dependencies, nullptr, &dependency_count);
+      cudaStreamGetCaptureInfo_v2(p.stream[0], &status, &id, &capturing,
+                                  &dependencies, &dependency_count);
+#else
+  const cudaError_t info =
+      cudaStreamGetCaptureInfo(p.stream[0], &status, &id);
+#endif
   printf("      cudaStreamGetCaptureInfo -> %s (%zu deps)\n",
          cudaGetErrorName(info), dependency_count);
 
@@ -226,7 +231,7 @@ bool capturable_graph_node(Pair& p, cudaEvent_t fork_event,
   }
   if (added == cudaSuccess) {
     const cudaError_t updated = cudaStreamUpdateCaptureDependencies(
-        p.stream[0], &node, nullptr, 1, cudaStreamSetCaptureDependencies);
+        p.stream[0], &node, 1, cudaStreamSetCaptureDependencies);
     printf("      cudaStreamUpdateCaptureDependencies -> %s\n",
            cudaGetErrorName(updated));
     if (updated != cudaSuccess) added = updated;

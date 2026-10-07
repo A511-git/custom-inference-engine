@@ -32,16 +32,16 @@ echo " [Step 3/5] Compiling and Executing Transport Probes"
 echo "===================================================================="
 mkdir -p /tmp/probes
 echo "Compiling P2P Probe..."
-nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/p2p_probe.cu" -o /tmp/probes/p2p_probe
-/tmp/probes/p2p_probe 0 1 || true
+nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/p2p_probe.cu" -o /tmp/probes/p2p_probe || true
+if [ -f /tmp/probes/p2p_probe ]; then /tmp/probes/p2p_probe 0 1 || true; fi
 
 echo "Compiling Collective Transport Probe..."
-nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/transport_probe.cu" -o /tmp/probes/transport_probe
-/tmp/probes/transport_probe 0 1 || true
+nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/transport_probe.cu" -o /tmp/probes/transport_probe || true
+if [ -f /tmp/probes/transport_probe ]; then /tmp/probes/transport_probe 0 1 || true; fi
 
 echo "Compiling Mailbox Fallback Probe..."
-nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/mailbox_probe.cu" -o /tmp/probes/mailbox_probe
-/tmp/probes/mailbox_probe 0 1 || true
+nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/mailbox_probe.cu" -o /tmp/probes/mailbox_probe || true
+if [ -f /tmp/probes/mailbox_probe ]; then /tmp/probes/mailbox_probe 0 1 || true; fi
 
 echo "===================================================================="
 echo " [Step 4/5] Building NInfer Engine (Target: sm_75, INT8 KV Only)"
