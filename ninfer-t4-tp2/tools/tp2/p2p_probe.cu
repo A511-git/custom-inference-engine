@@ -64,7 +64,7 @@ namespace {
 constexpr size_t kBigBytes = 256u << 20;  // 256 MiB
 constexpr int kBigWarmup = 3;
 constexpr int kBigTimed = 8;
-constexpr double kMinGiBps = 25.0;
+constexpr double kMinGiBps = 7.0; // PCIe 3.0 x16 (Tesla T4 achieves ~9.18 GiB/s)
 
 constexpr size_t kSmallBytes = 10u << 10;  // 10 KiB
 constexpr int kSmallWarmup = 10;

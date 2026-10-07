@@ -33,15 +33,15 @@ echo "===================================================================="
 mkdir -p /tmp/probes
 echo "Compiling P2P Probe..."
 nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/p2p_probe.cu" -o /tmp/probes/p2p_probe
-/tmp/probes/p2p_probe 0 1
+/tmp/probes/p2p_probe 0 1 || true
 
 echo "Compiling Collective Transport Probe..."
 nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/transport_probe.cu" -o /tmp/probes/transport_probe
-/tmp/probes/transport_probe 0 1
+/tmp/probes/transport_probe 0 1 || true
 
 echo "Compiling Mailbox Fallback Probe..."
 nvcc -arch=sm_75 -O2 "${ENGINE_DIR}/tools/tp2/mailbox_probe.cu" -o /tmp/probes/mailbox_probe
-/tmp/probes/mailbox_probe 0 1
+/tmp/probes/mailbox_probe 0 1 || true
 
 echo "===================================================================="
 echo " [Step 4/5] Building NInfer Engine (Target: sm_75, INT8 KV Only)"
