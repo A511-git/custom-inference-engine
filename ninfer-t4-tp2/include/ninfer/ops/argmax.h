@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/device.h"
 #include "core/tensor.h"
 
 #include <cstdint>
@@ -25,7 +26,6 @@ struct LocalArgmaxScalar {
     std::int32_t idx;
 };
 
-struct ExecutionContext;
 class PeerEvents;
 
 /**

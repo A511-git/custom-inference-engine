@@ -88,7 +88,7 @@ void argmax_local_tp2_launch(const std::array<Tensor, 2>& part,
                              std::int32_t valid_rows,
                              const std::array<void*, 2>& local_scalars,
                              const std::array<void*, 2>& peer_scalars,
-                             const ExecutionContext& ec,
+                             const ::ninfer::ExecutionContext& ec,
                              const PeerEvents& events) {
     const std::int32_t columns = part[0].ne[1];
     if (columns == 0) { return; }

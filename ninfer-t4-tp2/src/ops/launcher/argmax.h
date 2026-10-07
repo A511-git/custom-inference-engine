@@ -2,17 +2,15 @@
 
 // ninfer::ops::detail - private launch prototype for argmax.
 
+#include "core/device.h"
 #include "core/tensor.h"
 
 #include <array>
 #include <cuda_runtime.h>
 
-namespace ninfer {
-struct ExecutionContext;
-namespace ops {
+namespace ninfer::ops {
 class PeerEvents;
-} // namespace ops
-} // namespace ninfer
+} // namespace ninfer::ops
 
 namespace ninfer::ops::detail {
 
