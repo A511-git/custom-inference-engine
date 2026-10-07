@@ -1,0 +1,41 @@
+# ==============================================================================
+# Git Attributes - ninfer-t4-tp2
+# Auto-detect text files and normalize line endings
+# ==============================================================================
+
+# Set default behaviour to automatically normalize line endings
+* text=auto
+
+# Source code files (force LF to prevent CUDA/compiler discrepancies)
+*.cu text eol=lf
+*.cuh text eol=lf
+*.cpp text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+
+# Build system
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# Shell scripts (force LF so bash doesn't fail on Linux/Kaggle with \r)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.safetensors binary
+*.bin binary
+*.gguf binary
+*.qus binary
