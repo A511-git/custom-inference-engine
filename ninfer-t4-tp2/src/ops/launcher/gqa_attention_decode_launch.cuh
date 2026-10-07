@@ -144,39 +144,12 @@ void launch_tc_partial_i8(const Tensor& q, CacheInput input, const Tensor& pos, 
             (DynamicArena ? static_cast<std::size_t>(4 * KeyBlock * kGqaHeadDim) : 0u) +
             kPageIdBytes;
         if constexpr (kDynamicBytes > 0) {
-#if defined(NINFER_SM75)
-            ensure_func_attr_per_device(
-                gqa_attention_decode_fa75_tiled_kernel<Geometry, TokenTile, WarpsPerCta,
-                                                     MinBlocksPerSm, KeyBlock, DynamicArena,
-                                                     MultiBatch, Masked, CacheInput>,
-                cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(kDynamicBytes));
-#else
             ensure_func_attr_per_device(
                 gqa_attention_decode_i8_tiled_kernel<Geometry, TokenTile, WarpsPerCta,
                                                      MinBlocksPerSm, KeyBlock, DynamicArena,
                                                      MultiBatch, Masked, CacheInput>,
                 cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(kDynamicBytes));
-#endif
         }
-#if defined(NINFER_SM75)
-        gqa_attention_decode_fa75_tiled_kernel<Geometry, TokenTile, WarpsPerCta, MinBlocksPerSm,
-                                             KeyBlock, DynamicArena, MultiBatch, Masked, CacheInput>
-            <<<grid, WarpsPerCta * 32, kDynamicBytes, stream>>>(
-                static_cast<const __nv_bfloat16*>(q.data), input,
-                static_cast<const std::int32_t*>(pos.data), static_cast<std::int8_t*>(cache_k.data),
-                static_cast<std::int8_t*>(cache_v.data), static_cast<__half*>(cache_k_scale.data),
-                static_cast<__half*>(cache_v_scale.data),
-                static_cast<const std::int32_t*>(cache.block_tables.data),
-                invocation.valid_columns == nullptr
-                    ? nullptr
-                    : static_cast<const std::int32_t*>(invocation.valid_columns->data),
-                invocation.table_rows == nullptr
-                    ? nullptr
-                    : static_cast<const std::int32_t*>(invocation.table_rows->data),
-                cache.block_tables.ne[0], invocation.full_width, invocation.column_begin,
-                logical_capacity, scale, static_cast<__nv_bfloat16*>(partial_acc.data),
-                static_cast<float*>(partial_m.data), static_cast<float*>(partial_l.data));
-#else
         gqa_attention_decode_i8_tiled_kernel<Geometry, TokenTile, WarpsPerCta, MinBlocksPerSm,
                                              KeyBlock, DynamicArena, MultiBatch, Masked, CacheInput>
             <<<grid, WarpsPerCta * 32, kDynamicBytes, stream>>>(
@@ -194,7 +167,6 @@ void launch_tc_partial_i8(const Tensor& q, CacheInput input, const Tensor& pos, 
                 cache.block_tables.ne[0], invocation.full_width, invocation.column_begin,
                 logical_capacity, scale, static_cast<__nv_bfloat16*>(partial_acc.data),
                 static_cast<float*>(partial_m.data), static_cast<float*>(partial_l.data));
-#endif
     };
     if constexpr (TokenTile == 6) {
         // Small grids need more warps per CTA. From 2K to 8K, Bc=64 halves key

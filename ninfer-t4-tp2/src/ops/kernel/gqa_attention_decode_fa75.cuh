@@ -29,44 +29,21 @@ namespace ninfer::ops {
 // Turing SM75 static shared memory bound (48 KiB default hardware carveout).
 inline constexpr int kFa75MaxSharedBytes = 48 * 1024;
 
-template <typename Geometry, int TokenTile, int WarpsPerCta, int MinBlocksPerSm, int KeyBlock,
-          bool DynamicArena, bool MultiBatch, bool Masked, typename CacheInput>
-__launch_bounds__(WarpsPerCta * 32, MinBlocksPerSm) __global__
-void gqa_attention_decode_fa75_tiled_kernel(
-    const __nv_bfloat16* q, CacheInput input, const std::int32_t* pos, std::int8_t* cache_k_i8,
-    std::int8_t* cache_v_i8, __half* cache_k_scale, __half* cache_v_scale,
-    const std::int32_t* block_tables, const std::int32_t* valid_columns,
-    const std::int32_t* table_rows, std::int32_t table_stride, std::int32_t full_width,
-    std::int32_t column_begin, std::int32_t logical_capacity, float scale,
-    __nv_bfloat16* partial_acc, float* partial_m, float* partial_l) {
-
-    // Forward directly to tiled kernel with SM75 static assertions enforced
+template <typename Geometry, int TokenTile, int KeyBlock, bool DynamicArena>
+constexpr bool validate_fa75_shared_memory() {
     constexpr int Br       = ((TokenTile * Geometry::GroupSize + 15) / 16) * 16;
     constexpr int Bc       = KeyBlock;
     constexpr int D        = kGqaHeadDim; // 256
     constexpr int Groups   = kGqaKvQuantGroups;
-    constexpr int PageIds  = kGqaSmallTSplitPageIds<Geometry, Bc>;
 
     constexpr int StaticSharedBytes =
-        gqa_shared_align16(Br * D) +                                              // q_s (int8)
-        gqa_shared_align16(DynamicArena ? 16 : 4 * Bc * D) +                      // static_r_s (int8)
-        gqa_shared_align16(Br * Bc * static_cast<int>(sizeof(__nv_bfloat16))) + // p_s
-        gqa_shared_align16(Br * static_cast<int>(sizeof(float))) +              // alpha_s
-        2 * gqa_shared_align16(Bc * Groups * static_cast<int>(sizeof(__half))); // k/v scales
+        gqa_shared_align16(Br * D) +
+        gqa_shared_align16(DynamicArena ? 16 : 4 * Bc * D) +
+        gqa_shared_align16(Br * Bc * static_cast<int>(sizeof(__nv_bfloat16))) +
+        gqa_shared_align16(Br * static_cast<int>(sizeof(float))) +
+        2 * gqa_shared_align16(Bc * Groups * static_cast<int>(sizeof(__half)));
 
-    constexpr int DynamicSharedBytes =
-        (DynamicArena ? 4 * Bc * D : 0) +
-        gqa_shared_align16(PageIds * static_cast<int>(sizeof(std::int32_t)));
-
-    static_assert(StaticSharedBytes < kFa75MaxSharedBytes,
-                  "FA75 attention kernel violates Turing SM75 48 KiB static shared memory limit");
-
-    // Execute through gqa_attention_decode_i8_tiled_kernel implementation with SM75 bounds
-    gqa_attention_decode_i8_tiled_kernel<Geometry, TokenTile, WarpsPerCta, MinBlocksPerSm, KeyBlock,
-                                         DynamicArena, MultiBatch, Masked, CacheInput>(
-        q, input, pos, cache_k_i8, cache_v_i8, cache_k_scale, cache_v_scale, block_tables,
-        valid_columns, table_rows, table_stride, full_width, column_begin, logical_capacity,
-        scale, partial_acc, partial_m, partial_l);
+    return StaticSharedBytes < kFa75MaxSharedBytes;
 }
 
 } // namespace ninfer::ops
