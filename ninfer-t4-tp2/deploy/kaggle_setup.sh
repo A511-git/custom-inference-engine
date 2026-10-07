@@ -10,7 +10,7 @@ ENGINE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BUILD_DIR="${ENGINE_DIR}/build"
 MODELS_DIR="/tmp/models"
 MODEL_FILE="${MODELS_DIR}/qwen3_6_27b.ninfer"
-MODEL_URL="https://huggingface.co/mr-september/Qwen3.6-27B-NInfer/resolve/main/qwen3_6_27b.ninfer"
+MODEL_URL="https://huggingface.co/neroued/Qwen3.6-27B-NInfer/resolve/main/qwen3_6_27b.ninfer"
 
 echo "===================================================================="
 echo " [Step 1/5] Verifying System Environment & GPUs"
@@ -66,6 +66,11 @@ if [ ! -f "${MODEL_FILE}" ]; then
     aria2c -x 16 -s 16 -k 1M -c "${MODEL_URL}" -d "${MODELS_DIR}" -o "qwen3_6_27b.ninfer"
 else
     echo "Model artifact already present at ${MODEL_FILE} ($(du -h "${MODEL_FILE}" | cut -f1))"
+fi
+
+if [ -f "${MODEL_FILE}" ]; then
+    echo "Verifying / adapting container format..."
+    python3 "${ENGINE_DIR}/tools/artifact/convert_v3_to_v2.py" "${MODEL_FILE}"
 fi
 
 echo "===================================================================="

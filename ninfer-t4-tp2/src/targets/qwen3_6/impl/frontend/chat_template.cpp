@@ -105,21 +105,21 @@ struct ThinkParts {
 
 ThinkParts derive_think_parts(const std::string& content) {
     ThinkParts parts;
-    const std::size_t first_close = content.find(" response");
+    const std::size_t first_close = content.find("</think>");
     if (first_close == std::string::npos) {
         parts.content = content;
         return parts;
     }
-    // reasoning = content.split(' response')[0].rstrip('\n').split(' thinking')[-1].lstrip('\n')
+    // reasoning = content.split('</think>')[0].rstrip('\n').split('<think>')[-1].lstrip('\n')
     std::string before          = rstrip_newlines(content.substr(0, first_close));
-    const std::size_t last_open = before.rfind(" thinking");
+    const std::size_t last_open = before.rfind("<think>");
     std::string reasoning       = (last_open == std::string::npos)
                                       ? before
-                                      : before.substr(last_open + std::string(" thinking").size());
+                                      : before.substr(last_open + std::string("<think>").size());
     parts.reasoning             = lstrip_newlines(std::move(reasoning));
-    // content = content.split(' response')[-1].lstrip('\n')
-    const std::size_t last_close = content.rfind(" response");
-    parts.content = lstrip_newlines(content.substr(last_close + std::string(" response").size()));
+    // content = content.split('</think>')[-1].lstrip('\n')
+    const std::size_t last_close = content.rfind("</think>");
+    parts.content = lstrip_newlines(content.substr(last_close + std::string("</think>").size()));
     return parts;
 }
 
@@ -335,7 +335,8 @@ std::string ChatMessage::rendered_content(bool add_vision_id, int* image_count,
 CompiledChatTemplate CompiledChatTemplate::resolve(std::string_view source,
                                                     ChatStyle chat_style) {
     const Sha256Digest digest = sha256(source);
-    if (digest == kThinkingToggleTemplateDigest) {
+    if (digest == kThinkingToggleTemplateDigest ||
+        source.find("enable_thinking") != std::string_view::npos) {
         return CompiledChatTemplate(ChatTemplateSemantics::ThinkingToggle, chat_style);
     }
     if (digest == kReasoningEffortTemplateDigest) {
@@ -459,9 +460,9 @@ RenderedChat CompiledChatTemplate::render(const std::vector<ChatMessage>& messag
         const bool emit_think = keep_thinking && !(chat_style_ == ChatStyle::SharpV22_1 &&
                                                    is_history_turn && reasoning.empty());
         if (emit_think) {
-            rendered += " thinking\n";
+            rendered += "<think>\n";
             rendered += reasoning;
-            rendered += "\n response\n\n";
+            rendered += "\n</think>\n\n";
         }
         rendered += body;
         if (!message.tool_calls.empty()) {
@@ -485,9 +486,9 @@ RenderedChat CompiledChatTemplate::render(const std::vector<ChatMessage>& messag
                 .kind = RewriteCheckpointKind::TurnClosure, .offset = rendered.size()};
         }
         if (options.enable_thinking) {
-            rendered += " thinking\n";
+            rendered += "<think>\n";
         } else {
-            rendered += " thinking\n\n response\n\n";
+            rendered += "<think>\n\n</think>\n\n";
         }
         if (preserve_thinking) {
             // Response replay retains the deterministic generation prologue. This is the prompt
